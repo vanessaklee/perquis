@@ -1,0 +1,57 @@
+<.header>
+  Excluded Persons
+</.header>
+
+<div class="search">
+  <form phx-submit="search">
+    <input type="text" name="first" value={@first} placeholder="First Name" autocomplete="false" />
+
+    <select name="conj">
+      <%= Phoenix.HTML.Form.options_for_select(
+        ["and", "or"],
+        @conj
+      ) %>
+    </select>
+
+    <input type="text" name="last" value={@last} placeholder="Last Name" autocomplete="false" />
+
+    <.button>
+      Search
+    </.button>
+  </form>
+</div>
+
+<.table
+  id="persons"
+  rows={@persons}
+  row_click={fn person -> JS.navigate(~p"/persons/#{person}") end}
+>
+  <:col :let={person} label="Last"><%= person.last %></:col>
+  <:col :let={person} label="First"><%= person.first %></:col>
+  <:col :let={person} label="Middle"><%= person.middle %></:col>
+  <:col :let={person} label="Specialty"><%= person.specialty %></:col>
+  <:col :let={person} label="Dob"><%= person.dob %></:col>
+  <:col :let={person} label="State"><%= person.state %></:col>
+  <:col :let={person} label="Zip"><%= person.zip %></:col>
+  <:action :let={person}>
+    <div class="sr-only">
+      <.link navigate={~p"/persons/#{person}"}>Show</.link>
+    </div>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="person-modal"
+  show
+  on_cancel={JS.patch(~p"/persons")}
+>
+  <.live_component
+    module={PerquisWeb.PersonLive.FormComponent}
+    id={@person.id || :new}
+    title={@page_title}
+    action={@live_action}
+    person={@person}
+    patch={~p"/persons"}
+  />
+</.modal>
